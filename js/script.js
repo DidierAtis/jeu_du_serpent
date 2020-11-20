@@ -36,6 +36,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 this.pomme = undefined;
             }
 
+            if (this.serpent!== undefined){
+                this.serpent.supprimeSerpent();
+                this.serpent = undefined;
+            }
+
 
         }
 
@@ -67,6 +72,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
             this.serpentLongueur = 1;
             this.tblCarreSerpent = [];
+
+
+            this.touche= false;
+
+
             this.vitesse = 250;
             this.timing = setInterval(this.controleSerpent.bind(this), this.vitesse);
 
@@ -112,17 +122,61 @@ document.addEventListener("DOMContentLoaded", function(event) {
             var nextY = this.currentY + this.nextMoveY;
 
 
+            //touche moi mm
+            this.tblCarreSerpent.forEach(function (element){
+                if (nextX === element[1]&& nextY === element[2]){
+
+                    this.leJeu.finPartie();
+                    this.touche = true;
+
+                }
+            }.bind(this));
+
+
+            if (nextY<0|| nextX <0|| this.leJeu.grandeurGrille-1 < nextY || this.leJeu.grandeurGrille-1<nextX){
+
+                this.leJeu.finPartie();
+                this.touche = true;
+            }
+
+
+            if (!this.touche){
+
+                if (this.currentX === this.leJeu.pomme.pomme[1] && this.currentY === this.leJeu.pomme.pomme[2]){
+                    this.serpentLongueur++;
+
+                    this.leJeu.affichagePointage(this.serpentLongueur);
+                    this.leJeu.pomme.suprimePomme();
+                    this.leJeu.pomme.ajoutePomme();
+
+                }
             this.dessineCarre(nextX,nextY);
             this.currentX = nextX;
             this.currentY = nextY;
-
+        }
         }
 
         dessineCarre(x,y){
 
+            var unCarre = [this.leJeu.s.rect(x* this.leJeu.grandeurCarre, y*this.leJeu.grandeurCarre,this.leJeu.grandeurCarre,this.leJeu.grandeurCarre),x,y];
+
+
+            this.tblCarreSerpent.push(unCarre);
+            if (this.serpentLongueur<this.tblCarreSerpent.length)
+            {
+                this.tblCarreSerpent[0][0].remove();
+                this.tblCarreSerpent.shift();
+            }
         }
 
         supprimeSerpent(){
+
+            clearInterval(this.timing);
+
+            while (0<this.tblCarreSerpent.length){
+                this.tblCarreSerpent[0][0].remove();
+                this.tblCarreSerpent.shift();
+            }
 
         }
 
